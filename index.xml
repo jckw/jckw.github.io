@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jack Weatherilt</title>
+    <link>http://jckw.xyz/</link>
+    <description>Recent content on Jack Weatherilt</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <copyright>Copyleft (GNU GPL)</copyright>
+    <lastBuildDate>Sun, 20 Aug 2017 17:40:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://jckw.xyz/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Setting up Let&#39;s Encrypt with a Bitnami Ghost image</title>
+      <link>http://jckw.xyz/posts/bitnami-ghost/</link>
+      <pubDate>Sun, 20 Aug 2017 17:40:00 +0000</pubDate>
+      
+      <guid>http://jckw.xyz/posts/bitnami-ghost/</guid>
+      <description>Generally: if you&amp;rsquo;re entering details, you should encrypt the data.
+Since Let&amp;rsquo;s Encrypt was launched in 2016, adding an SSL certificate and maintaining it has been so simple that it&amp;rsquo;s really a must. Using the EFF&amp;rsquo;s certbot makes this super easy and there are only a few issues that arise when using a Bitnami image for your Ghost blog that are easily ironed-out.
+Where this guide should work I&amp;rsquo;ve based this guide off of my experience setting up SSL for this blog from a Bitnami Ghost image on an AWS EC2 (free-tier) Ubuntu 14.</description>
+    </item>
+    
+  </channel>
+</rss>

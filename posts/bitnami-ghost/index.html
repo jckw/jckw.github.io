@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+	<head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Jack Weatherilt">
+
+<meta name="generator" content="Hugo 0.31.1" />
+<title>Setting up Let&#39;s Encrypt with a Bitnami Ghost image</title>
+<link rel="shortcut icon" href="http://jckw.xyz/images/favicon.ico">
+<link rel="stylesheet" href="http://jckw.xyz/css/style.css">
+<link rel="stylesheet" href="http://jckw.xyz/css/highlight.css">
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+
+
+
+
+<meta property="og:title" content="Setting up Let&#39;s Encrypt with a Bitnami Ghost image" />
+<meta property="og:description" content="Generally: if you&rsquo;re entering details, you should encrypt the data.
+Since Let&rsquo;s Encrypt was launched in 2016, adding an SSL certificate and maintaining it has been so simple that it&rsquo;s really a must. Using the EFF&rsquo;s certbot makes this super easy and there are only a few issues that arise when using a Bitnami image for your Ghost blog that are easily ironed-out.
+Where this guide should work I&rsquo;ve based this guide off of my experience setting up SSL for this blog from a Bitnami Ghost image on an AWS EC2 (free-tier) Ubuntu 14." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://jckw.xyz/posts/bitnami-ghost/" />
+
+
+
+<meta property="article:published_time" content="2017-08-20T17:40:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2017-08-20T17:40:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Setting up Let&#39;s Encrypt with a Bitnami Ghost image">
+<meta itemprop="description" content="Generally: if you&rsquo;re entering details, you should encrypt the data.
+Since Let&rsquo;s Encrypt was launched in 2016, adding an SSL certificate and maintaining it has been so simple that it&rsquo;s really a must. Using the EFF&rsquo;s certbot makes this super easy and there are only a few issues that arise when using a Bitnami image for your Ghost blog that are easily ironed-out.
+Where this guide should work I&rsquo;ve based this guide off of my experience setting up SSL for this blog from a Bitnami Ghost image on an AWS EC2 (free-tier) Ubuntu 14.">
+
+
+<meta itemprop="datePublished" content="2017-08-20T17:40:00&#43;00:00" />
+<meta itemprop="dateModified" content="2017-08-20T17:40:00&#43;00:00" />
+<meta itemprop="wordCount" content="910">
+
+
+
+<meta itemprop="keywords" content="" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Setting up Let&#39;s Encrypt with a Bitnami Ghost image"/>
+<meta name="twitter:description" content="Generally: if you&rsquo;re entering details, you should encrypt the data.
+Since Let&rsquo;s Encrypt was launched in 2016, adding an SSL certificate and maintaining it has been so simple that it&rsquo;s really a must. Using the EFF&rsquo;s certbot makes this super easy and there are only a few issues that arise when using a Bitnami image for your Ghost blog that are easily ironed-out.
+Where this guide should work I&rsquo;ve based this guide off of my experience setting up SSL for this blog from a Bitnami Ghost image on an AWS EC2 (free-tier) Ubuntu 14."/>
+
+
+    </head>
+<body>
+    <nav class="main-nav">
+	
+		<a href='http://jckw.xyz/'> <span class="arrow">←</span>Home</a>
+	
+
+	
+
+	
+</nav>
+
+    <section id="wrapper">
+        
+        
+<article class="post">
+    <header>
+        <h1>Setting up Let&#39;s Encrypt with a Bitnami Ghost image</h1>
+        <h2 class="subtitle"></h2>
+        <h2 class="headline">
+        August 20, 2017
+        <br>
+        
+        </h2>
+    </header>
+    <section id="post-body">
+        
+
+<p>Generally: if you&rsquo;re entering details, you should encrypt the data.</p>
+
+<p>Since Let&rsquo;s Encrypt was launched in 2016, adding an SSL certificate and maintaining it has been so simple that it&rsquo;s really a must.  Using the EFF&rsquo;s certbot makes this super easy and there are only a few issues that arise when using a Bitnami image for your Ghost blog that are easily ironed-out.</p>
+
+<h5 id="where-this-guide-should-work">Where this guide should work</h5>
+
+<p>I&rsquo;ve based this guide off of my experience setting up SSL for this blog from a Bitnami Ghost image on an AWS EC2 (free-tier) Ubuntu 14.04 server.</p>
+
+<p>I imagine that this will work for any other version of Ubuntu; more important is that you&rsquo;re using the Bitnami image (since this is what makes using Let&rsquo;s Encrypt slightly more tricky).</p>
+
+<h4 id="installing-certbot">Installing certbot</h4>
+
+<p><code>certbot</code> is the tool that makes setting up and renewing a certificate so much easier. Ubuntu likely comes with  copy of certbot, but since it&rsquo;s still a new tool and is being actively developed, you may as well grab the latest version from the specific repository:</p>
+
+<pre><code class="language-bash">$ sudo add-apt-repository ppa:certbot/certbot
+</code></pre>
+
+<p>You&rsquo;ll be asked whether you accept a few things (which you have to to use the package repository), so press <code>ENTER</code> a few times when necessary.</p>
+
+<p>Now we&rsquo;ll want to update the package list, so run:</p>
+
+<pre><code class="language-bash">$ sudo apt-get update
+</code></pre>
+
+<p>Now we can install certbot using:</p>
+
+<pre><code class="language-bash">$ sudo apt-get install python-certbot-apache
+</code></pre>
+
+<h4 id="generating-an-ssl-certificate">Generating an SSL certificate</h4>
+
+<p>This is where the Bitnami image makes things a bit more complicated. It doesn&rsquo;t use the apache2 that comes with Ubuntu, but uses its own server root in <code>/opt/bitnami/apache2</code>.</p>
+
+<p>First of all we&rsquo;ll want to stop our services so that we don&rsquo;t mess anything up by changing files on a live service.</p>
+
+<pre><code class="language-bash">$ sudo /opt/bitnami/ctlscript.sh stop
+</code></pre>
+
+<p>We can either change our Virtual Hosts configuration automatically by specifying more parameters for certbot; but since this could be temperamental we can also do this manually (and ignore what certbot does by default).</p>
+
+<p>So we&rsquo;re generating a certificate for <em>both</em> the base domain and <code>www.&lt;BASE_DOMAIN&gt;</code>, since visitors are likely to use both.</p>
+
+<h6 id="option-1-changing-virtual-host-configuration-automatically">Option 1: Changing Virtual Host configuration automatically</h6>
+
+<p>Remember to replace <code>vegetables.wtf</code> with your own domain name.</p>
+
+<pre><code class="language-bash">$ certbot --apache --apache-server-root '/opt/bitnami/apache2' --apache-vhost-root '/opt/bitnami/apps/ghost/conf' --apache-le-vhost-ext '-vhosts.conf' -d vegetables.wtf -d www.vegetables.wtf
+</code></pre>
+
+<p>You&rsquo;ll be asked to fill in an emergency contact email and choose whether you want to force SSL.</p>
+
+<p>Now check your virtual host configuration is correct.</p>
+
+<pre><code class="language-bash">$ less /opt/bitnami/apps/ghost/conf/httpd-vhosts.conf
+</code></pre>
+
+<p>This should show your virtual hosts configuration with your Let&rsquo;s Encrypt keys referenced something like this:</p>
+
+<pre><code>...
+
+&lt;VirtualHost *:443&gt;
+...
+    SSLCertificateFile &quot;/etc/letsencrypt/live/vegetables.wtf/cert.pem&quot;
+    SSLCertificateKeyFile &quot;/etc/letsencrypt/live/vegetables.wtf/privkey.pem&quot;
+    SSLCertificateChainFile &quot;/etc/letsencrypt/live/vegetables.wtf/fullchain.pem&quot;
+...
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>If it does, then you&rsquo;re done configuring this file (but there&rsquo;s still a little bit left).</p>
+
+<h5 id="option-2-configuring-the-virtual-hosts-manually">Option 2: Configuring the Virtual Hosts manually</h5>
+
+<p>If the above didn&rsquo;t work, and certbot couldn&rsquo;t find your vhosts file or it wasn&rsquo;t updated with your keys, then we can just change these values manually.</p>
+
+<p>If certbot failed, just run:</p>
+
+<pre><code class="language-bash">$ certbot --apache -d vegetables.wtf -d www.vegetables.wtf
+</code></pre>
+
+<p>The locations of keys should be given out just before certbot quits. They should be at <code>/etc/letsencrypt/live/vegetables.wtf/</code>.</p>
+
+<p>Now simply edit your vhosts file using a text editor like Nano or Vim:</p>
+
+<pre><code class="language-bash">$ nano /opt/bitnami/apps/ghost/conf/httpd-vhosts.conf
+</code></pre>
+
+<p>Add in the lines pointing to your certificates, the same as certbot would&rsquo;ve. Obviously replace with your own domain path again.</p>
+
+<pre><code>...
+
+&lt;VirtualHost *:443&gt;
+...
+    SSLCertificateFile &quot;/etc/letsencrypt/live/vegetables.wtf/cert.pem&quot;
+    SSLCertificateKeyFile &quot;/etc/letsencrypt/live/vegetables.wtf/privkey.pem&quot;
+    SSLCertificateChainFile &quot;/etc/letsencrypt/live/vegetables.wtf/fullchain.pem&quot;
+...
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>That should be done! Now all that&rsquo;s left is getting Bitnami to recognise the certificates too.</p>
+
+<h4 id="get-bitnami-s-apache-to-register-the-certificates">Get Bitnami&rsquo;s Apache to register the certificates</h4>
+
+<p>We&rsquo;re going to be editing <code>/opt/bitnami/apache2/conf/bitnami/bitnami.conf</code>, so open up your editor again to do this.</p>
+
+<pre><code class="language-bash">$ nano /opt/bitnami/apache2/conf/bitnami/bitnami.conf
+</code></pre>
+
+<p>We&rsquo;re going to be adding the same lines in again, so your configuration file should look something like this:</p>
+
+<pre><code>...
+
+&lt;VirtualHost _default_:443&gt;
+...
+    SSLCertificateFile &quot;/etc/letsencrypt/live/vegetables.wtf/cert.pem&quot;
+    SSLCertificateKeyFile &quot;/etc/letsencrypt/live/vegetables.wtf/privkey.pem&quot;
+    SSLCertificateChainFile &quot;/etc/letsencrypt/live/vegetables.wtf/fullchain.pem&quot;
+...
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>Save and quit, and you&rsquo;ve now got a valid SSL certificate for your site for the next 3 months.</p>
+
+<p>Time to start your services again, so run:</p>
+
+<pre><code class="language-bash">$ sudo /opt/bitnami/ctlscript.sh restart
+</code></pre>
+
+<p>If everything looks like it&rsquo;s up and running try it out by going to <a href="https://yoursite.com">https://yoursite.com</a>.</p>
+
+<h4 id="set-up-auto-renewal">Set up auto-renewal</h4>
+
+<p>Since the certificate expires after 3 months, and we&rsquo;re all lazy/ efficient, you&rsquo;ll almost definitely want to set up auto-renewal.</p>
+
+<p>We&rsquo;ll use <code>crontab</code> to run a renewal process everyday at 3:15 am.</p>
+
+<pre><code class="language-bash">$ sudo crontab -e
+</code></pre>
+
+<p>Choose an editor and it will open up the editor. Paste this at the end of the file:</p>
+
+<pre><code>...
+
+15 3 * * * /usr/bin/certbot renew --quiet
+</code></pre>
+
+<p>This means that certbot will run the renew command at 3 15 everyday in quiet mode, so that there&rsquo;s no output.</p>
+
+<p>Save and quit, and now you&rsquo;ll hopefully never have to manage your SSL certificates for this site again.</p>
+
+<h4 id="redirecting-users-to-https-from-http">Redirecting users to HTTPS from HTTP</h4>
+
+<p>This is super simple, and worth it since otherwise users will be using the standard <code>http</code> connection when they type in your domain to their browsers.</p>
+
+<p>It is a redirect, so obviously it will have to be slightly slower but it&rsquo;s not noticeable so don&rsquo;t worry too much.</p>
+
+<p>Open up <code>/opt/bitnami/apps/ghost/conf/httpd-prefix.conf</code>, and, at the top, paste:</p>
+
+<pre><code>RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [R,L]
+</code></pre>
+
+<p>You might want to reboot your Apache server again.</p>
+
+<pre><code class="language-bash">$ sudo /opt/bitnami/ctlscript.sh restart
+</code></pre>
+
+<p>That&rsquo;s it! Now try going to <a href="http://yoursite.com">http://yoursite.com</a> and hopefully you&rsquo;ll be redirected to a secure connection.</p>
+
+<h6 id="if-you-re-troubleshooting-try">If you&rsquo;re troubleshooting, try:</h6>
+
+<ul>
+<li><a href="https://seiler.it/lets-encrypt-your-server/">https://seiler.it/lets-encrypt-your-server/</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-let-s-encrypt-certificates-for-multiple-apache-virtual-hosts-on-ubuntu-14-04">https://www.digitalocean.com/community/tutorials/how-to-set-up-let-s-encrypt-certificates-for-multiple-apache-virtual-hosts-on-ubuntu-14-04</a></li>
+</ul>
+
+<p>Also thanks to Erika Heidi and Sven Seiler for those guides, since they helped me set up my server and write this guide!</p>
+
+    </section>
+</article>
+
+<footer id="post-meta" class="clearfix">
+    
+    <img class="avatar" src="http://jckw.xyz/images/avatar.png">
+    <div>
+        <span class="dark">Jack Weatherilt</span>
+        <span></span>
+    </div>
+    
+    <section id="sharing">
+        <a class="twitter" href="https://twitter.com/intent/tweet?text=http%3a%2f%2fjckw.xyz%2fposts%2fbitnami-ghost%2f - Setting%20up%20Let%27s%20Encrypt%20with%20a%20Bitnami%20Ghost%20image "><span class="icon-twitter"> tweet</span></a>
+
+<a class="facebook" href="#" onclick="
+    window.open(
+      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+      'facebook-share-dialog',
+      'width=626,height=436');
+    return false;"><span class="icon-facebook-rect"> Share</span>
+</a>
+
+    </section>
+</footer>
+
+
+
+<ul id="post-list" class="archive readmore">
+    <h3>Read more</h3>
+
+    
+    
+    
+</ul>
+
+
+
+        <footer id="footer">
+    
+        <div id="social">
+
+	
+	
+    <a class="symbol" href="https://www.github.com/jckw/">
+        <i class="fa fa-github"></i>
+    </a>
+    
+
+
+</div>
+
+    
+    <p class="small">
+    
+        Copyleft (GNU GPL)
+    
+    </p>
+</footer>
+
+    </section>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://jckw.xyz/js/main.js"></script>
+<script src="http://jckw.xyz/js/highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+</body>
+</html>
