@@ -3,29 +3,29 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://jckw.xyz/posts/bitnami-ghost/</loc>
+    <loc>http://jackw.xyz/posts/bitnami-ghost/</loc>
     <lastmod>2017-08-20T17:40:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://jckw.xyz/categories/</loc>
+    <loc>http://jackw.xyz/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://jckw.xyz/</loc>
-    <lastmod>2017-08-20T17:40:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://jckw.xyz/posts/</loc>
+    <loc>http://jackw.xyz/</loc>
     <lastmod>2017-08-20T17:40:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://jckw.xyz/tags/</loc>
+    <loc>http://jackw.xyz/posts/</loc>
+    <lastmod>2017-08-20T17:40:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://jackw.xyz/tags/</loc>
     <priority>0</priority>
   </url>
   
