@@ -135,6 +135,10 @@ textarea {
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+b {
+  font-weight: 700;
+}
+
 /** Custom styles **/
 
 .container {
