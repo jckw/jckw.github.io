@@ -232,6 +232,11 @@ a:hover {
   margin: 2rem 0;
 }
 
+.message p,
+.project p {
+  line-height: 1.7;
+}
+
 p {
   margin-bottom: 0.5rem;
 }
