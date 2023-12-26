@@ -163,10 +163,6 @@ h2 {
   text-transform: uppercase;
 }
 
-p {
-  margin-bottom: 0.25rem;
-}
-
 a {
   transition: box-shadow 160ms ease 0s;
   box-shadow: rgb(238, 251, 255) 0px -9px 0px inset;
@@ -234,4 +230,8 @@ a:hover {
 
 .message {
   margin: 2rem 0;
+}
+
+p {
+  margin-bottom: 0.5rem;
 }
