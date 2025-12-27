@@ -28,6 +28,9 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@jackw_xyz" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>J</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js" defer></script>
@@ -35,12 +38,32 @@
   </head>
 
   <body>
+    <div class="marquee-wrapper">
+      <div class="marquee">
+        <span>Software Engineer</span>
+        <span class="star">*</span>
+        <span>Tech Lead</span>
+        <span class="star">*</span>
+        <span>Product Designer</span>
+        <span class="star">*</span>
+        <span>Brooklyn, NY</span>
+        <span class="star">*</span>
+        <span>Software Engineer</span>
+        <span class="star">*</span>
+        <span>Tech Lead</span>
+        <span class="star">*</span>
+        <span>Product Designer</span>
+        <span class="star">*</span>
+        <span>Brooklyn, NY</span>
+        <span class="star">*</span>
+      </div>
+    </div>
     <main class="container">
-      <h1>
-        <img src="name.png" height="16px" alt="jack weatherilt" />
-      </h1>
-      <p>Brooklyn, NY</p>
-      <p class="grey">Tech Lead / Software Engineer</p>
+      <header class="hero">
+        <p class="eyebrow"><span class="star">*</span> Available for select projects <span class="star">*</span></p>
+        <h1>Jack Weatherilt</h1>
+      </header>
+      <div class="divider"><span class="star">*</span><span class="star">*</span><span class="star">*</span></div>
       <article class="message">
         <p>
           Hey, I'm Jack. I'm the founding software engineer at Outro Health, a
@@ -80,62 +103,63 @@
           </a>
         </p>
       </article>
+      <div class="divider"><span class="star">*</span><span class="star">*</span><span class="star">*</span></div>
       <section class="section">
-        <h2>Education</h2>
-        <p>
+        <h2><span class="star">*</span> Education</h2>
+        <div class="education-item">
           <span class="headline">University of Oxford</span>
-        </p>
-        <p>
-          <span class="grey"> BA Computer Science & Philosophy</span>
-        </p>
+          <span class="degree">BA Computer Science & Philosophy</span>
+        </div>
       </section>
+      <div class="divider"><span class="star">*</span><span class="star">*</span><span class="star">*</span></div>
       <section class="section">
-        <h2>Clients / Employers</h2>
+        <h2><span class="star">*</span> Clients & Employers</h2>
         <div class="experience">
           <span class="headline">Outro Health</span>
-          <span class="grey">2023 - Present</span>
+          <span class="mono date">2023 — Present</span>
         </div>
         <div class="experience">
           <span class="headline">Delphia Technologies</span>
-          <span class="grey">2022 - 2023</span>
+          <span class="mono date">2022 — 2023</span>
         </div>
         <div class="experience">
           <span class="headline">Marchon Training</span>
-          <span class="grey">2022 - 2023</span>
+          <span class="mono date">2022 — 2023</span>
         </div>
         <div class="experience">
           <span class="headline">Lazer Technologies</span>
-          <span class="grey">2021 - 2022</span>
+          <span class="mono date">2021 — 2022</span>
         </div>
         <div class="experience">
           <span class="headline">Mem Protocol</span>
-          <span class="grey">2022</span>
+          <span class="mono date">2022</span>
         </div>
         <div class="experience">
           <span class="headline">Hitchhiker Labs</span>
-          <span class="grey">2021</span>
+          <span class="mono date">2021</span>
         </div>
         <div class="experience">
           <span class="headline">Buoyant Cloud</span>
-          <span class="grey">2021</span>
+          <span class="mono date">2021</span>
         </div>
         <div class="experience">
           <span class="headline">Pogoseat</span>
-          <span class="grey">2020 - 2021</span>
+          <span class="mono date">2020 — 2021</span>
         </div>
         <div class="experience">
           <span class="headline">Pallet</span>
-          <span class="grey">2019 - 2020</span>
+          <span class="mono date">2019 — 2020</span>
         </div>
         <div class="experience">
           <span class="headline">Finimize</span>
-          <span class="grey">2018 - 2019, 2021</span>
+          <span class="mono date">2018 — 2019, 2021</span>
         </div>
       </section>
+      <div class="divider"><span class="star">*</span><span class="star">*</span><span class="star">*</span></div>
       <section class="section">
-        <h2>Projects</h2>
-        <article class="project">
-          <h3 class="headline">
+        <h2><span class="star">*</span> Projects</h2>
+        <article class="project project-featured">
+          <h3 class="headline headline-huge">
             <a
               target="_blank"
               rel="noopener"
@@ -144,9 +168,7 @@
               until.dev
             </a>
           </h3>
-          <p>
-            <span class="grey">2024</span>
-          </p>
+          <p class="mono date">2024</p>
           <p>
             until is a new funding model for open-source software that makes it
             possible for small and medium-sized projects to receive ad hoc
@@ -177,9 +199,7 @@
               Continuum
             </a>
           </h3>
-          <p>
-            <span class="grey">2023 - 2024</span>
-          </p>
+          <p class="mono date">2023 — 2024</p>
           <p>
             Continuum is a minimal iOS app and widget that shows you the % of
             your day that has passed and the % of your day that is left.
@@ -197,9 +217,7 @@
               pints.club</a
             >)
           </h3>
-          <p>
-            <span class="grey">April 2019 - 2021</span>
-          </p>
+          <p class="mono date">2019 — 2021</p>
           <p>
             Pints.wtf is a viral website that ranks drinks in Wetherspoons pubs
             by their value for alcohol.
@@ -246,7 +264,7 @@
           <p>
             Sadly, in 2021 I forgot to update my expired credit card info on the
             domain registrar and the site was unjustly sold on auction. To this
-            day, I am still bitter about that (2021 - Present).
+            day, I am still bitter about that <span class="mono">(2021 — Present)</span>.
           </p>
           <p>
             I rebuilt the site with Next.js and tRPC in 2023 and relaunched the
@@ -285,8 +303,21 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
+        // Scramble the h1 name immediately
+        const h1 = document.querySelector("h1");
+        if (h1) {
+          const name = h1.textContent.trim();
+          h1.style.visibility = "hidden";
+          requestAnimationFrame(() => {
+            h1.style.visibility = "visible";
+            h1.textContent = "";
+            scrambleText(h1, name, 1);
+          });
+        }
+
+        // Scramble headlines on scroll
         const headlines = document.querySelectorAll(".headline");
-        
+
         headlines.forEach((el) => {
           el.dataset.text = el.textContent.trim();
           el.style.visibility = "hidden";
@@ -299,7 +330,7 @@
                 const el = entry.target;
                 el.style.visibility = "visible";
                 el.textContent = "";
-                scrambleText(el, el.dataset.text, 0.6);
+                scrambleText(el, el.dataset.text, 0.5);
                 observer.unobserve(el);
               }
             });
