@@ -30,16 +30,18 @@
 
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>J</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/TextPlugin.min.js" defer></script>
   </head>
 
   <body>
-    <div class="container">
+    <main class="container">
       <h1>
         <img src="name.png" height="16px" alt="jack weatherilt" />
       </h1>
       <p>Brooklyn, NY</p>
       <p class="grey">Tech Lead / Software Engineer</p>
-      <div class="message">
+      <article class="message">
         <p>
           Hey, I'm Jack. I'm the founding software engineer at Outro Health, a
           virtual clinic helping Americans taper off of antidepressants safely.
@@ -77,8 +79,8 @@
             email me.
           </a>
         </p>
-      </div>
-      <div class="section">
+      </article>
+      <section class="section">
         <h2>Education</h2>
         <p>
           <span class="headline">University of Oxford</span>
@@ -86,8 +88,8 @@
         <p>
           <span class="grey"> BA Computer Science & Philosophy</span>
         </p>
-      </div>
-      <div class="section">
+      </section>
+      <section class="section">
         <h2>Clients / Employers</h2>
         <div class="experience">
           <span class="headline">Outro Health</span>
@@ -129,10 +131,10 @@
           <span class="headline">Finimize</span>
           <span class="grey">2018 - 2019, 2021</span>
         </div>
-      </div>
-      <div class="section">
+      </section>
+      <section class="section">
         <h2>Projects</h2>
-        <div class="project">
+        <article class="project">
           <h3 class="headline">
             <a
               target="_blank"
@@ -164,8 +166,8 @@
             love the concept.
           </p>
           <p>The project launched in 2024 but has since been shut down.</p>
-        </div>
-        <div class="project">
+        </article>
+        <article class="project">
           <h3 class="headline">
             <a
               target="_blank"
@@ -187,8 +189,8 @@
             myself that I have more time in my day than I realise, and that I
             can make use of it.
           </p>
-        </div>
-        <div class="project">
+        </article>
+        <article class="project">
           <h3 class="headline">
             pints.wtf (now
             <a target="_blank" rel="noopener" href="https://www.pints.club/">
@@ -253,8 +255,60 @@
               pints.club</a
             >.
           </p>
-        </div>
-      </div>
-    </div>
+        </article>
+      </section>
+    </main>
+    <script>
+      const chars = "!@#$%^&*()_+-=[]{}|;:,./<>?";
+      
+      function scrambleText(element, finalText, duration = 1) {
+        const length = finalText.length;
+        let iteration = 0;
+        const totalIterations = duration * 60;
+        
+        const interval = setInterval(() => {
+          element.textContent = finalText
+            .split("")
+            .map((char, i) => {
+              if (char === " ") return " ";
+              if (i < iteration / (totalIterations / length)) return char;
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("");
+          
+          iteration++;
+          if (iteration >= totalIterations) {
+            element.textContent = finalText;
+            clearInterval(interval);
+          }
+        }, 1000 / 60);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const headlines = document.querySelectorAll(".headline");
+        
+        headlines.forEach((el) => {
+          el.dataset.text = el.textContent.trim();
+          el.style.visibility = "hidden";
+        });
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const el = entry.target;
+                el.style.visibility = "visible";
+                el.textContent = "";
+                scrambleText(el, el.dataset.text, 0.6);
+                observer.unobserve(el);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        headlines.forEach((el) => observer.observe(el));
+      });
+    </script>
   </body>
 </html>
