@@ -124,6 +124,34 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+:root {
+  --color-bg: #ffffff;
+  --color-text: #333333;
+  --color-text-muted: #6b7075;
+  --color-heading: #c9cccf;
+  --color-link: #323336;
+  --color-highlight: rgb(207, 243, 255);
+  --color-highlight-subtle: rgb(238, 251, 255);
+  --color-focus: rgb(107, 193, 215);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1a1a;
+    --color-text: #e5e5e5;
+    --color-text-muted: #8a8d8f;
+    --color-heading: #5a5d60;
+    --color-link: #e5e5e5;
+    --color-highlight: rgba(50, 80, 90, 0.8);
+    --color-highlight-subtle: rgba(50, 80, 90, 0.5);
+    --color-focus: rgb(107, 193, 215);
+  }
+
+  h1 img {
+    filter: invert(1);
+  }
+}
+
 html,
 button,
 input,
@@ -141,11 +169,15 @@ b {
 
 /** Custom styles **/
 
+body {
+  background-color: var(--color-bg);
+}
+
 .container {
   margin: 0 auto;
   padding: 4rem 2rem 8rem 2rem;
   max-width: 600px;
-  color: #333333;
+  color: var(--color-text);
 }
 
 h1 {
@@ -159,19 +191,19 @@ h2 {
   margin-bottom: 1rem;
   font-size: 12px;
   font-weight: 600;
-  color: #c9cccf;
+  color: var(--color-heading);
   text-transform: uppercase;
 }
 
 a {
   transition: box-shadow 160ms ease 0s;
-  box-shadow: rgb(238, 251, 255) 0px -9px 0px inset;
-  border-bottom: 2px solid rgb(207, 243, 255);
+  box-shadow: var(--color-highlight-subtle) 0px -9px 0px inset;
+  border-bottom: 2px solid var(--color-highlight);
   text-decoration: none;
-  color: #323336;
+  color: var(--color-link);
 }
 a:hover {
-  box-shadow: rgb(207, 243, 255) 0px -1.2em 0px inset;
+  box-shadow: var(--color-highlight) 0px -1.2em 0px inset;
 }
 
 .section ul {
@@ -185,7 +217,7 @@ a:hover {
 }
 
 .grey {
-  color: #96999b;
+  color: var(--color-text-muted);
 }
 
 .experience {
@@ -239,4 +271,41 @@ a:hover {
 
 p {
   margin-bottom: 0.5rem;
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-highlight);
+  color: var(--color-text);
+}
+
+/* Focus states for accessibility */
+a:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Page fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container {
+  animation: fadeIn 0.4s ease-out;
 }
