@@ -58,10 +58,37 @@
 
   const random = (n) => crypto.getRandomValues(new Uint8Array(n));
 
-  // Some password-manager extensions hand back base64url strings where the
-  // browser would give an ArrayBuffer.
-  const bytes = (v) =>
-    typeof v === "string" ? unb64(v.replace(/-/g, "+").replace(/_/g, "/")) : v;
+  // Password-manager extensions replace navigator.credentials and don't always
+  // hand back the ArrayBuffers the browser would: strings, plain arrays and
+  // { 0: 1, 1: 2, … } objects all turn up. Normalise to a Uint8Array, and
+  // refuse anything that isn't `size` bytes rather than derive a key from junk.
+  function bytes(v, what, size) {
+    let out = null;
+    try {
+      if (typeof v === "string") {
+        out = unb64(v.replace(/-/g, "+").replace(/_/g, "/"));
+      } else if (ArrayBuffer.isView(v)) {
+        out = new Uint8Array(v.buffer, v.byteOffset, v.byteLength).slice();
+      } else if (Object.prototype.toString.call(v) === "[object ArrayBuffer]") {
+        out = new Uint8Array(v).slice();
+      } else if (v && typeof v === "object") {
+        const list = typeof v.length === "number" ? Array.from(v) : Object.values(v);
+        if (list.every((n) => Number.isInteger(n) && n >= 0 && n < 256)) {
+          out = Uint8Array.from(list);
+        }
+      }
+    } catch {}
+    if (!out || !out.length || (size && out.length !== size)) {
+      const shape =
+        v && typeof v === "object"
+          ? `${Object.prototype.toString.call(v)} with ${Object.keys(v).length} keys`
+          : typeof v;
+      const err = new Error(`the passkey provider returned an unusable ${what} (${shape})`);
+      err.name = "PasskeyError";
+      throw err;
+    }
+    return out;
+  }
 
   // --- local copy ----------------------------------------------------------
 
@@ -71,6 +98,7 @@
       const fields = ["cred", "salt", "iv", "data"];
       if (!r || !fields.every((k) => typeof r[k] === "string")) return null;
       fields.forEach((k) => atob(r[k]));
+      if (!r.cred || !r.salt) return null;
       return {
         cred: r.cred,
         salt: r.salt,
@@ -111,7 +139,10 @@
     // Some authenticators only hand over PRF output when signing in, not at
     // creation. Then there's no secret yet, and the first unlock supplies it.
     const first = prf.results && prf.results.first;
-    return { id: bytes(cred.rawId), secret: first ? bytes(first) : null };
+    return {
+      id: bytes(cred.rawId, "credential id"),
+      secret: first ? bytes(first, "secret", 32) : null,
+    };
   }
 
   // With no credId the browser offers whichever journal passkeys it has,
@@ -128,7 +159,10 @@
     });
     const prf = assertion.getClientExtensionResults().prf;
     if (!prf || !prf.results || !prf.results.first) throw new Error("no-prf");
-    return { id: bytes(assertion.rawId), secret: bytes(prf.results.first) };
+    return {
+      id: bytes(assertion.rawId, "credential id"),
+      secret: bytes(prf.results.first, "secret", 32),
+    };
   }
 
   const hkdf = (secret) =>
@@ -355,11 +389,11 @@
         if (err.message === "http-401") throw new Error("wrong-key");
         reachable = false;
       }
-      if (!remote && !local) {
-        throw new Error(reachable ? "no-journal" : "offline");
-      }
+      // A passkey with no journal anywhere (say, creation was interrupted)
+      // simply starts an empty one.
+      if (!remote && !local && !reachable) throw new Error("offline");
 
-      record.salt = (remote || local).salt;
+      record.salt = (remote || local || { salt: b64(random(32)) }).salt;
       const k = await deriveKey(secret, unb64(record.salt));
       const mine = local ? await unseal(local, k) : {};
       const theirs = remote ? await unseal(remote, k) : null;
@@ -512,7 +546,6 @@
     const known = {
       "no-prf": "This passkey provider can't derive encryption keys — try another",
       "wrong-key": "That passkey doesn't open this journal",
-      "no-journal": "There's no journal for that passkey",
       offline: "Can't reach the server",
     };
     if (err && known[err.message]) return known[err.message];
