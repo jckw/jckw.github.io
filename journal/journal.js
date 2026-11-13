@@ -58,6 +58,11 @@
 
   const random = (n) => crypto.getRandomValues(new Uint8Array(n));
 
+  // Some password-manager extensions hand back base64url strings where the
+  // browser would give an ArrayBuffer.
+  const bytes = (v) =>
+    typeof v === "string" ? unb64(v.replace(/-/g, "+").replace(/_/g, "/")) : v;
+
   // --- local copy ----------------------------------------------------------
 
   function loadRecord() {
@@ -104,11 +109,9 @@
     const prf = cred.getClientExtensionResults().prf;
     if (!prf || !(prf.enabled || prf.results)) throw new Error("no-prf");
     // Some authenticators only hand over PRF output when signing in, not at
-    // creation, so that costs a second prompt.
-    const secret =
-      (prf.results && prf.results.first) ||
-      (await getPasskey(cred.rawId)).secret;
-    return { id: cred.rawId, secret };
+    // creation. Then there's no secret yet, and the first unlock supplies it.
+    const first = prf.results && prf.results.first;
+    return { id: bytes(cred.rawId), secret: first ? bytes(first) : null };
   }
 
   // With no credId the browser offers whichever journal passkeys it has,
@@ -125,7 +128,7 @@
     });
     const prf = assertion.getClientExtensionResults().prf;
     if (!prf || !prf.results || !prf.results.first) throw new Error("no-prf");
-    return { id: assertion.rawId, secret: prf.results.first };
+    return { id: bytes(assertion.rawId), secret: bytes(prf.results.first) };
   }
 
   const hkdf = (secret) =>
@@ -168,6 +171,7 @@
   }
 
   async function unseal(r, k) {
+    if (!r.data) return {}; // created, never yet unlocked
     let parsed;
     try {
       const plain = await crypto.subtle.decrypt(
@@ -320,9 +324,14 @@
   async function create() {
     const { id, secret } = await createPasskey();
     const salt = random(32);
+    record = { cred: b64(id), salt: b64(salt), iv: "", data: "", version: 0 };
+    store();
+    if (!secret) {
+      render();
+      return setStatus("Passkey created — unlock to start writing");
+    }
     key = await deriveKey(secret, salt);
     token = await deriveToken(secret);
-    record = { cred: b64(id), salt: b64(salt), iv: "", data: "", version: 0 };
     entries = {};
     dirty = true;
     await seal();
@@ -511,7 +520,8 @@
       return "Cancelled";
     }
     console.error(err);
-    return "Something went wrong";
+    const detail = err && [err.name, err.message].filter(Boolean).join(": ");
+    return "Something went wrong" + (detail ? ` (${detail.slice(0, 200)})` : "");
   }
 
   function action(button, fn) {
