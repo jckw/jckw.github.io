@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- Nothing third-party on this page: same-origin script and styles, and
+         the page may only talk to the journal API (and its local dev copy). -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src data:; connect-src https://jackw-journal.jackweatherilt.workers.dev http://localhost:8787; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Journal | Jack Weatherilt</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>J</text></svg>">
+    <style>
+      [hidden] {
+        display: none !important;
+      }
+
+      .journal h1 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .journal button {
+        appearance: none;
+        background: none;
+        border: 0;
+        border-bottom: 2px solid var(--color-highlight);
+        border-radius: 0;
+        padding: 0;
+        font-size: inherit;
+        line-height: inherit;
+        color: var(--color-link);
+        cursor: pointer;
+        transition: box-shadow 160ms ease 0s;
+        box-shadow: var(--color-highlight-subtle) 0px -9px 0px inset;
+      }
+
+      .journal button:hover {
+        box-shadow: var(--color-highlight) 0px -1.2em 0px inset;
+      }
+
+      .journal button:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+      }
+
+      .journal button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .journal-view {
+        margin-top: 2rem;
+      }
+
+      .journal-view p {
+        line-height: 1.7;
+      }
+
+      .journal-action {
+        margin-top: 1.5rem;
+      }
+
+      .journal-cipher {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        word-break: break-all;
+        max-height: 8em;
+        overflow: hidden;
+        user-select: none;
+        -webkit-mask-image: linear-gradient(#000 30%, transparent);
+        mask-image: linear-gradient(#000 30%, transparent);
+      }
+
+      .journal-entry h2 {
+        margin-top: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .journal-entry textarea {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 1.7em;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: none;
+        resize: none;
+        overflow: hidden;
+        background: transparent;
+        color: var(--color-text);
+        caret-color: var(--color-focus);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      .journal-entry textarea::placeholder {
+        color: var(--color-heading);
+      }
+
+      .journal-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.25rem;
+        margin-top: 4rem;
+        font-size: 14px;
+      }
+
+      .journal-footer .journal-status {
+        margin-left: auto;
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="container journal">
+      <h1>Journal</h1>
+      <p class="grey">End-to-end encrypted. Opened with a passkey.</p>
+
+      <section id="view-unsupported" class="journal-view" hidden>
+        <p>
+          This browser can't do passkey encryption, so there's nothing to see
+          here.
+        </p>
+      </section>
+
+      <section id="view-empty" class="journal-view" hidden>
+        <p>
+          Nothing here yet. Creating a journal makes a passkey; the encryption
+          key is derived from it each time you unlock, and never stored.
+        </p>
+        <p class="journal-action">
+          <button id="create" type="button">Create a journal</button>
+          <span class="grey">or</span>
+          <button id="open-existing" type="button">open an existing one</button>
+        </p>
+      </section>
+
+      <section id="view-locked" class="journal-view" hidden>
+        <p id="cipher" class="journal-cipher grey" aria-hidden="true"></p>
+        <p class="journal-action">
+          <button id="unlock" type="button">Unlock</button>
+        </p>
+      </section>
+
+      <section id="view-open" class="journal-view" hidden>
+        <div id="entries"></div>
+      </section>
+
+      <footer class="journal-footer">
+        <a href="/">← back</a>
+        <button id="lock" type="button" hidden>Lock</button>
+        <p id="status" class="journal-status grey" role="status"></p>
+      </footer>
+    </main>
+    <script src="journal.js"></script>
+  </body>
+</html>

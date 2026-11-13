@@ -1,0 +1,11 @@
+# Backend for /journal. The leading underscore keeps this directory out of the
+# GitHub Pages build. Deploy with: npx wrangler deploy
+name = "jackw-journal"
+main = "worker.js"
+compatibility_date = "2026-05-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jackw-journal"
+database_id = "d1af8036-292a-4c7f-8eab-4a8fbe71012f"

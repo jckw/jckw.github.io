@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS journals (
+  id TEXT PRIMARY KEY,
+  auth TEXT NOT NULL,
+  salt TEXT NOT NULL,
+  iv TEXT NOT NULL,
+  data TEXT NOT NULL,
+  version INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
